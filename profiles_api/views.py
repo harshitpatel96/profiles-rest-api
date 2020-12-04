@@ -2,9 +2,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets
+from rest_framework.authentication import TokenAuthentication
 
 from profiles_api import serializers
-
+from profiles_api import models
+from profiles_api import permissions
 
 class HelloApiView(APIView):
     """Test API View"""
@@ -90,4 +92,17 @@ class HelloViewSet(viewsets.ViewSet):
 
     def destroy(self, request, pk=None):
         """Handle removing an object"""
-        return Response({'http_method': 'DELETE'})
+        return Response({'http_imethod': 'DELETE'})
+
+# We will create a model viewset
+# token authentication works by generating a random authentication string that is sent along with every request that the user makes
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    """Handle creating and updating profiles"""
+    serializer_class = serializers.UserProfileSerializer
+    # we alos provide a query set to model view set so it knows which objects in the database are going to be managed by this viewset
+    queryset = models.UserProfile.objects.all()
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.UpdateOwnProfile,)
+
+
